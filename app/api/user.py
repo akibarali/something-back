@@ -22,7 +22,7 @@ router = APIRouter(tags=["users"])
     response_model=UserRead,
     status_code=status.HTTP_201_CREATED,
     tags=["auth"],
-    summary="Регистрация нового пользователя",
+    summary="Registering a new user",
 )
 @limiter.limit("5/minute")
 async def register(
@@ -35,7 +35,7 @@ async def register(
     if not created:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Пользователь с таким именем уже существует.",
+            detail="A user with this name already exists.",
         )
     return user
 
@@ -44,7 +44,7 @@ async def register(
     "/users/login",
     response_model=UserRead,
     tags=["auth"],
-    summary="Вход (аутентификация)",
+    summary="Login (authentication)",
 )
 @limiter.limit("10/minute")
 async def login(request: Request, body: UserLogin, db: AsyncSession = Depends(get_db)):
@@ -53,7 +53,7 @@ async def login(request: Request, body: UserLogin, db: AsyncSession = Depends(ge
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Неверное имя пользователя или пароль.",
+            detail="Incorrect username or password.",
         )
     return user
 
@@ -62,13 +62,13 @@ async def login(request: Request, body: UserLogin, db: AsyncSession = Depends(ge
     path="/users/list",
     response_model=PaginatedResponse[UserListItem],
     tags=["users"],
-    summary="Список всех пользователей",
+    summary="List of all users",
 )
 @limiter.limit("30/minute")
 async def list_users(
     request: Request,
-    page: int = Query(default=1, ge=1, description="Номер страницы"),
-    page_size: int = Query(default=10, ge=1, le=100, description="Кол-во на странице"),
+    page: int = Query(default=1, ge=1, description="Page number"),
+    page_size: int = Query(default=10, ge=1, le=100, description="Quantity per page"),
     db: AsyncSession = Depends(get_db),
 ):
     service = UserService(db)
@@ -79,7 +79,7 @@ async def list_users(
     path="/users/{user_id}",
     response_model=UserRead,
     tags=["users"],
-    summary="Детальная информация о пользователе",
+    summary="Detailed user information",
 )
 @limiter.limit("30/minute")
 async def get_user(request: Request, user_id: int, db: AsyncSession = Depends(get_db)):
@@ -88,6 +88,6 @@ async def get_user(request: Request, user_id: int, db: AsyncSession = Depends(ge
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Пользователь с id={user_id} не найден.",
+            detail=f"User with id={user_id} not found.",
         )
     return user
