@@ -3,11 +3,13 @@ import os
 from fastapi import FastAPI, Request, Response, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
 from app.core.limiter import limiter
 from app.api.user import router as user_router
+from app.api.user_photo import router as user_photo_router
 
 app = FastAPI(title="Something API")
 
@@ -15,6 +17,10 @@ origins = [
     "http://localhost",
     "http://localhost:8000",
 ]
+
+os.makedirs("media/user_photos", exist_ok=True)
+
+app.mount("/media", StaticFiles(directory="media"), name="media")
 
 ALLOWED_HOSTS = {"localhost", "127.0.0.1"}
 
@@ -86,3 +92,4 @@ async def main(request: Request):
 
 
 app.include_router(user_router)
+app.include_router(user_photo_router)
