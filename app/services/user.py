@@ -10,8 +10,16 @@ class UserService:
     def __init__(self, db: AsyncSession):
         self.repo = UserRepository(db)
 
-    async def register(self, username: str, email: str, password: str):
-        return await self.repo.get_or_create(username=username, email=email, password=password)
+    async def register(
+        self, first_name: str, last_name: str, username: str, email: str, password: str
+    ):
+        return await self.repo.get_or_create(
+            first_name=first_name,
+            last_name=last_name,
+            username=username,
+            email=email,
+            password=password,
+        )
 
     async def login(self, username: str, password: str) -> User | None:
         return await self.repo.authenticate(username=username, password=password)
@@ -28,3 +36,9 @@ class UserService:
 
     async def get_by_id(self, user_id: int) -> User | None:
         return await self.repo.get_by_id(user_id=user_id)
+
+    async def update(self, user_id: int, data: dict) -> User | None:
+        user = await self.repo.get_by_id(user_id=user_id)
+        if not user:
+            return None
+        return await self.repo.update(user=user, data=data)
